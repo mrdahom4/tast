@@ -26,92 +26,98 @@ client.on('ready', () => {
   console.log('')
 });
 
-client.on('message',async message => {
-    const moment = require('moment');
-const ms = require('ms')
-    var prefix = '#' // البريفكس
-  var time = moment().format('Do MMMM YYYY , hh:mm');
-  var room;
-  var title;
-  var duration;
-  var currentTime = new Date(),
-hours = currentTime.getHours() + 3 ,
-minutes = currentTime.getMinutes(),
-done = currentTime.getMinutes() + duration,
-seconds = currentTime.getSeconds();
-if (minutes < 10) {
-minutes = "0" + minutes;
+client.on('message', message => {
+    var prefix = "#"
+  if (!message.content.startsWith(prefix)) return;
+
+  let command = message.content.split(" ")[0];
+  command = command.slice(prefix.length);
+
+  let args = message.content.split(" ").slice(1);
+
+  if (command == "ban") {
+               if(!message.channel.guild) return message.reply('** This command only for servers**');
+         
+  if(!message.guild.member(message.author).hasPermission("BAN_MEMBERS")) return message.reply("**You Don't Have ` BAN_MEMBERS ` Permission**");
+  if(!message.guild.member(client.user).hasPermission("BAN_MEMBERS")) return message.reply("**I Don't Have ` BAN_MEMBERS ` Permission**");
+  let user = message.mentions.users.first();
+  let reason = message.content.split(" ").slice(2).join(" ");
+  if (message.mentions.users.size < 1) return message.reply("**منشن شخص**");
+  if (!message.guild.member(user)
+  .bannable) return message.reply("**لايمكنني طرد شخص اعلى من رتبتي يرجه اعطاء البوت رتبه عالي**");
+
+  message.guild.member(user).ban(7, user);
+
+
+  message.channel.send(`✅  ${user} banned from the server ! ✈    `)
 }
-var suffix = "AM";
-if (hours >= 12) {
-suffix = "PM";
-hours = hours - 12;
-}
-if (hours == 0) {
-hours = 12;
-}
- 
-  var filter = m => m.author.id === message.author.id;
-  if(message.content.startsWith(prefix + "gv")) { // الامر
- 
-    if(!message.guild.member(message.author).hasPermission('MANAGE_GUILD')) return message.channel.send(':heavy_multiplication_x:| **يجب أن يكون لديك خاصية التعديل على السيرفر**');
-        max: 1,
-        time: 20000,
-        errors: ['time']
-      }).then(collected => {
-        let room = message.guild.channels.find('name' , collected.first().content);
-        if(!room) return message.channel.send(':heavy_multiplication_x:| **i Found It :(**');
-        room = collected.first().content;
-        collected.first().delete();
-        msg.edit(':eight_pointed_black_star:| **Time For The Giveaway**').then(msg => {
-          message.channel.awaitMessages(filter, {
-            max: 1,
-            time: 20000,
-            errors: ['time']
-          }).then(collected => {
-            if(!collected.first().content.match(/[1-60][s,m,h,d,w]/g)) return message.channel.send('**The Bot Not Support This Time**');
-            duration = collected.first().content
-            collected.first().delete();
-            msg.edit(':eight_pointed_black_star:| **Now send The Present **').then(msg => {
-              message.channel.awaitMessages(filter, {
-                max: 1,
-                time: 20000,
-                errors: ['time']
-              }).then(collected => {
-                title = collected.first().content;
-                collected.first().delete();
-                msg.delete();
-                message.delete();
-                try {
-                  let giveEmbed = new Discord.RichEmbed()
-                  .setDescription(`**${title}** \nReact With 🎉 To Enter! \nTime remaining : ${duration} \n **Created at :** ${hours}:${minutes}:${seconds} ${suffix}`)
-                  .setFooter(message.author.username, message.author.avatarURL);
-                  message.guild.channels.find("name" , room).send(' :heavy_check_mark: **Giveaway Created** :heavy_check_mark:' , {embed: giveEmbed}).then(m => {
-                     let re = m.react('🎉');
-                     setTimeout(() => {
-                       let users = m.reactions.get("🎉").users
-                       let list = users.array().filter(u => u.id !== m.author.id !== client.user.id);
-                       let gFilter = list[Math.floor(Math.random() * list.length) + 0]
-                       let endEmbed = new Discord.RichEmbed()
-                       .setAuthor(message.author.username, message.author.avatarURL)
-                       .setTitle(title)
-                       .addField('Giveaway Ended !🎉',`Winners : ${gFilter} \nEnded at :`)
-                       .setTimestamp()
-                     m.edit('** 🎉 GIVEAWAY ENDED 🎉**' , {embed: endEmbed});
-                    message.guild.channels.find("name" , room).send(`**Congratulations ${gFilter}! You won The \`${title}\`**` , {embed: {}})
-                }, ms(duration));
-            });
-                } catch(e) {
-                message.channel.send(`:heavy_multiplication_x:| **i Don't Have Prem**`);
-                  console.log(e);
-                }
-              });
-            });
-          });
-        });
-      });
-    });
-  }
 });
+
+
+client.on('message',  message =>{ //Toxic Codes
+var moruad = 60000;//Toxic Codes
+if (message.author.omar) return;//Toxic Codes
+if (!message.content.startsWith(prefix)) return;//Toxic Codes
+if(!message.channel.guild) return message.channel.send('**هذا الأمر فقط للسيرفرات**').then(m => m.delete(5000));//Toxic Codes
+if(!message.guild.member(client.user).hasPermission("MANAGE_ROLES")) return message.reply("**I Don't Have `MANAGE_ROLES` Permission**").then(msg => msg.delete(6000))//Toxic Codes
+var command = message.content.split(" ")[0];//Toxic Codes
+command = command.slice(prefix.length);//Toxic Codes
+var args = message.content.split(" ").slice(1);//Toxic Codes
+    if(command == "mute") {//Toxic Codes
+   var tomute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));//Toxic Codes
+    if(!tomute) return message.reply("**يجب عليك المنشن اولاّ**:x: ") .then(m => m.delete(5000));//Toxic Codes
+    if(tomute.hasPermission("MANAGE_MESSAGES"))return      message.channel.send('**للأسف لا أمتلك صلاحية** `MANAGE_MASSAGEES`');
+    var muterole = message.guild.roles.find(`name`, "Muted");//Toxic Codes
+    //start of create role
+    if(!muterole){
+      try{//Toxic Codes
+        muterole =  message.guild.createRole({//Toxic Codes
+          name: "Muted",
+          color: "#070000",
+          permissions:[]
+        })//Toxic Codes
+        message.guild.channels.forEach((channel, id) => {//Toxic Codes
+          channel.overwritePermissions(muterole, {
+            SEND_MESSAGES: false,//Toxic Codes
+            ADD_REACTIONS: false
+          });//Toxic Codes
+        });//Toxic Codes
+      }catch(e){
+        console.log(e.stack);//Toxic Codes
+      }
+    }//Toxic Codes
+    //end of create role//Toxic Codes
+  var mutetime = args[1];
+    if(!mutetime) return message.reply("**يرجى تحديد وقت الميوت**:x:");//Toxic Codes
+if(isNaN(mutetime)) return message.reply("** يرجي تحديد الوقت بـ الارقام فقط الارقام بلدقائق")//Toxic Codes
+   (tomute.addRole(muterole.id));
+message.reply(`<@${tomute.id}> **تم اعطائه ميوت ومدة الميوت** : ${mutetime}m`);//Toxic Codes
+setTimeout(function(){//Toxic Codes
+      tomute.removeRole(muterole.id);//Toxic Codes
+      message.channel.send(`<@${tomute.id}> **انقضى الوقت وتم فك الميوت عن الشخص**:white_check_mark: `);//Toxic Codes
+    }, mutetime*moruad);
+ 
+//Toxic Codes//Toxic Codes//Toxic Codes//Toxic Codes//Toxic Codes//Toxic Codes//Toxic Codes//Toxic Codes
+//Toxic Codes
+  }
+if(command === `unmute`) {//Toxic Codes
+  if(!message.member.hasPermission("MANAGE_ROLES")) return message.channel.sendMessage("**ليس لديك صلاحية لفك عن الشخص ميوت**:x: ").then(m => m.delete(5000));//Toxic Codes
+if(!message.guild.member(client.user).hasPermission("MANAGE_ROLES")) return message.reply("**I Don't Have `MANAGE_ROLES` Permission**").then(msg => msg.delete(6000))//Toxic Codes
+ 
+ var toMute = message.guild.member(message.mentions.users.first()) || message.guild.members.get(args[0]);//Toxic Codes
+  if(!toMute) return message.channel.sendMessage("**عليك المنشن أولاّ**:x: ");//Toxic Codes
+ 
+  var role = message.guild.roles.find (r => r.name === "Muted");//Toxic Codes
+ 
+  if(!role || !toMute.roles.has(role.id)) return message.channel.sendMessage("**لم يتم اعطاء هذه شخص ميوت من الأساس**:x:")//Toxic Codes
+ 
+  toMute.removeRole(role)
+  message.channel.sendMessage("**لقد تم فك الميوت عن شخص بنجاح**:white_check_mark:");//Toxic Codes
+//Toxic Codes
+  return;
+ 
+  }//Toxic Codes
+ 
+});//Toxic Codes
 
 client.login(process.env.BOT_TOKEN);
