@@ -27,98 +27,70 @@ client.on('ready', () => {
   console.log('')
 });
 
-client.on('message', message => {
-    var prefix = "#"
-  if (!message.content.startsWith(prefix)) return;
-
-  let command = message.content.split(" ")[0];
-  command = command.slice(prefix.length);
-
-  let args = message.content.split(" ").slice(1);
-
-  if (command == "ban") {
-               if(!message.channel.guild) return message.reply('** This command only for servers**');
-         
-  if(!message.guild.member(message.author).hasPermission("BAN_MEMBERS")) return message.reply("**You Don't Have ` BAN_MEMBERS ` Permission**");
-  if(!message.guild.member(client.user).hasPermission("BAN_MEMBERS")) return message.reply("**I Don't Have ` BAN_MEMBERS ` Permission**");
-  let user = message.mentions.users.first();
-  let reason = message.content.split(" ").slice(2).join(" ");
-  if (message.mentions.users.size < 1) return message.reply("**منشن شخص**");
-  if (!message.guild.member(user)
-  .bannable) return message.reply("**لايمكنني طرد شخص اعلى من رتبتي يرجه اعطاء البوت رتبه عالي**");
-
-  message.guild.member(user).ban(7, user);
-
-
-  message.channel.send(`✅  ${user} banned from the server ! ✈    `)
-}
-});
-
-
-client.on('message',  message =>{ //Toxic Codes
-var moruad = 60000;//Toxic Codes
-if (message.author.omar) return;//Toxic Codes
-if (!message.content.startsWith(prefix)) return;//Toxic Codes
-if(!message.channel.guild) return message.channel.send('**هذا الأمر فقط للسيرفرات**').then(m => m.delete(5000));//Toxic Codes
-if(!message.guild.member(client.user).hasPermission("MANAGE_ROLES")) return message.reply("**I Don't Have `MANAGE_ROLES` Permission**").then(msg => msg.delete(6000))//Toxic Codes
-var command = message.content.split(" ")[0];//Toxic Codes
-command = command.slice(prefix.length);//Toxic Codes
-var args = message.content.split(" ").slice(1);//Toxic Codes
-    if(command == "mute") {//Toxic Codes
-   var tomute = message.guild.member(message.mentions.users.first() || message.guild.members.get(args[0]));//Toxic Codes
-    if(!tomute) return message.reply("**يجب عليك المنشن اولاّ**:x: ") .then(m => m.delete(5000));//Toxic Codes
-    if(tomute.hasPermission("MANAGE_MESSAGES"))return      message.channel.send('**للأسف لا أمتلك صلاحية** `MANAGE_MASSAGEES`');
-    var muterole = message.guild.roles.find(`name`, "Muted");//Toxic Codes
-    //start of create role
-    if(!muterole){
-      try{//Toxic Codes
-        muterole =  message.guild.createRole({//Toxic Codes
-          name: "Muted",
-          color: "#070000",
-          permissions:[]
-        })//Toxic Codes
-        message.guild.channels.forEach((channel, id) => {//Toxic Codes
-          channel.overwritePermissions(muterole, {
-            SEND_MESSAGES: false,//Toxic Codes
-            ADD_REACTIONS: false
-          });//Toxic Codes
-        });//Toxic Codes
-      }catch(e){
-        console.log(e.stack);//Toxic Codes
-      }
-    }//Toxic Codes
-    //end of create role//Toxic Codes
-  var mutetime = args[1];
-    if(!mutetime) return message.reply("**يرجى تحديد وقت الميوت**:x:");//Toxic Codes
-if(isNaN(mutetime)) return message.reply("** يرجي تحديد الوقت بـ الارقام فقط الارقام بلدقائق")//Toxic Codes
-   (tomute.addRole(muterole.id));
-message.reply(`<@${tomute.id}> **تم اعطائه ميوت ومدة الميوت** : ${mutetime}m`);//Toxic Codes
-setTimeout(function(){//Toxic Codes
-      tomute.removeRole(muterole.id);//Toxic Codes
-      message.channel.send(`<@${tomute.id}> **انقضى الوقت وتم فك الميوت عن الشخص**:white_check_mark: `);//Toxic Codes
-    }, mutetime*moruad);
+client.on("message", (message) => {
+  let men = message.mentions.users.first()
  
-//Toxic Codes//Toxic Codes//Toxic Codes//Toxic Codes//Toxic Codes//Toxic Codes//Toxic Codes//Toxic Codes
-//Toxic Codes
+  if (message.author.bot) return;
+    if (message.author.id === client.user.id) return;
+    if(!message.channel.guild) return;
+if (message.content.startsWith(prefix + 'credit')) {
+  if(men) {
+    if (!profile[men.id]) profile[men.id] = {
+    lastDaily:'Not Collected',
+    credits: 1,
+  };
   }
-if(command === `unmute`) {//Toxic Codes
-  if(!message.member.hasPermission("MANAGE_ROLES")) return message.channel.sendMessage("**ليس لديك صلاحية لفك عن الشخص ميوت**:x: ").then(m => m.delete(5000));//Toxic Codes
-if(!message.guild.member(client.user).hasPermission("MANAGE_ROLES")) return message.reply("**I Don't Have `MANAGE_ROLES` Permission**").then(msg => msg.delete(6000))//Toxic Codes
+  if(men) {
+message.channel.send(`** ${men.username}, :credit_card: balance` + " is `" + `${profile[men.id].credits}$` + "`.**")
+} else {
+  message.channel.send(`** ${message.author.username}, your :credit_card: balance` + " is `" + `${profile[message.author.id].credits}$` + "`.**")
+}
+}
  
- var toMute = message.guild.member(message.mentions.users.first()) || message.guild.members.get(args[0]);//Toxic Codes
-  if(!toMute) return message.channel.sendMessage("**عليك المنشن أولاّ**:x: ");//Toxic Codes
+if(message.content.startsWith(prefix + "daily")) {
+  if(profile[message.author.id].lastDaily != moment().format('day')) {
+    profile[message.author.id].lastDaily = moment().format('day')
+    profile[message.author.id].credits += 200
+     message.channel.send(`**${message.author.username} you collect your \`200\` :dollar: daily pounds**`)
+} else {
+    message.channel.send(`**:stopwatch: | ${message.author.username}, your daily :yen: credits refreshes ${moment().endOf('day').fromNow()}**`)
+}
+  }
+
  
-  var role = message.guild.roles.find (r => r.name === "Muted");//Toxic Codes
+ let cont = message.content.slice(prefix.length).split(" ");
+let args = cont.slice(1);
+let sender = message.author
+if(message.content.startsWith(prefix + 'credits')) {
+          if (!args[0]) {
+            message.channel.send(`**Usage: ${prefix}trans @someone amount**`);
+         return;
+           }
+        // We should also make sure that args[0] is a number
+        if (isNaN(args[0])) {
+            message.channel.send(`**Usage: ${prefix}trans @someone amount**`);
+            return; // Remember to return if you are sending an error message! So the rest of the code doesn't run.
+             }
+            let defineduser = '';
+            let firstMentioned = message.mentions.users.first();
+            defineduser = (firstMentioned)
+            if (!defineduser) return message.channel.send(`**Usage: ${prefix}trans @someone amount**`);
+            var mentionned = message.mentions.users.first();
+if (!profile[sender.id]) profile[sender.id] = {}
+if (!profile[sender.id].credits) profile[sender.id].credits = 200;
+fs.writeFile('profile.json', JSON.stringify(profile), (err) => {
+if (err) console.error(err);
+})
+      var mando = message.mentions.users.id;
+      if  (!profile[defineduser.id]) profile[defineduser.id] = {}
+      if (!profile[defineduser.id].credits) profile[defineduser.id].credits = 200;
+      profile[defineduser.id].credits += (+args[0]);
+      profile[sender.id].credits += (-args[0]);
+      let mariam = message.author.username
+message.channel.send(`**:moneybag: | ${message.author.username}, has transferrerd ` + "`" + args[0] + "$` to " + `<@${defineduser.id}>**`)
+}
  
-  if(!role || !toMute.roles.has(role.id)) return message.channel.sendMessage("**لم يتم اعطاء هذه شخص ميوت من الأساس**:x:")//Toxic Codes
+      });
  
-  toMute.removeRole(role)
-  message.channel.sendMessage("**لقد تم فك الميوت عن شخص بنجاح**:white_check_mark:");//Toxic Codes
-//Toxic Codes
-  return;
- 
-  }//Toxic Codes
- 
-});//Toxic Codes
 
 client.login(process.env.BOT_TOKEN);
